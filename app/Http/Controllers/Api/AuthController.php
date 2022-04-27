@@ -14,8 +14,7 @@ class AuthController extends Controller
 {
     
     private static $messages = [
-        'required' => 'El campo : email es obligatorio.',
-        'email' => 'El correo debe ser una dirección de correo válida',
+        'required' => 'El campo : token es obligatorio.'
     ];
 
     public function authenticateLogin(Request $request) {
@@ -47,13 +46,15 @@ class AuthController extends Controller
                 );
             }
             
-          // dd("Antes del Query", $token);
+           
 
        
-            $PerfilesUsers = DB::connection('mysql2')->table('CLIENT')->where('ID','f58ed2f3-eda1-4440-bfef-f254936e83e0')->get();  
+           $PerfilesUsers = DB::connection('mysql3')->select("select odi.f_get_id_person('$token')");   
+           //$PerfilesUsers = DB::connection('mysql2')->table('CLIENT')->where('ID','f58ed2f3-eda1-4440-bfef-f254936e83e0')->get();  
 
-            
-            if ($PerfilesUsers->count()) { //(evaluar si los SP generan count)
+           dd("Luego del Query", $PerfilesUsers);
+
+            if ($PerfilesUsers) { //(evaluar si los SP generan count)
 
                 foreach ($PerfilesUsers as $PerfilesUs) {
                    
@@ -75,10 +76,10 @@ class AuthController extends Controller
 
                         
 
-                        //$UserOdiPerfiles = DB::select("call splogin('$email', '$zuma_user_id')"); 
-                        $UserOdiPerfiles = DB::connection('mysql3')->table('T_Function')->where('N_description','Ingreso de Centros')->first();
+                        $UserOdiPerfiles = DB::connection('mysql3')->select("call sp_get_functions_by_user('$token')"); 
+                        //$UserOdiPerfiles = DB::connection('mysql3')->table('T_Function')->where('N_description','Ingreso de Centros')->first();
 
-                        dd($UserOdiPerfiles->N_function_name);
+                        dd($UserOdiPerfiles);
 
                        //if ($UserOdiPerfiles->count()) { // se activa al poner en funcion el select de SP (evaluar si los SP generan count)
 
@@ -93,7 +94,7 @@ class AuthController extends Controller
                                         return response()->json(
                                             [
                                                 'resultado' => false,
-                                                'mensaje' => "El email que intenta ingresar, se encuentra inactivo."
+                                                'mensaje' => "El usuario que intenta ingresar, se encuentra inactivo."
                                             ]
                                         );
                                     }
@@ -137,28 +138,24 @@ class AuthController extends Controller
 
 
             } catch (Exception $ex) {
-            Log::error('Ha ocurrido un error al obtener los perfiles del usuario '. $ex);
-            
-            return response()->json(
-                [
-                    'resultado' => false,
-                    'mensaje' =>  $ex  
-                ]
-            );
+                Log::error('Ha ocurrido un error al obtener los perfiles del usuario '. $ex);
+                
+                return response()->json(
+                    [
+                        'resultado' => false,
+                        'mensaje' =>  $ex  
+                    ]
+                );
+            }
+
+        } else {  
+        return response()->json(
+            [ 'resultado' => false,
+                'mensaje' =>'Proceso no atorizado, debe enviar los datos en un formato autorizado. '
+            ],
+            401, []); 
         }
 
-   } else 
-    {  
-      return response()->json(
-          [ 'resultado' => false,
-            'mensaje' =>'Proceso no atorizado, debe enviar los datos en un formato autorizado. '
-          ],
-          401, []); 
     }
-
-
-
-    }
-
 
 }

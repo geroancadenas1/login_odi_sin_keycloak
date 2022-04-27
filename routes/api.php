@@ -18,16 +18,16 @@ use App\Http\Controllers\Api\AuthController;
 
 
 Route::controller(UserRegisterController::class)->group(function(){
-    Route::post('/register', 'register');
-    Route::post('/login', 'login');
+    Route::post('/users-register-odi', 'register');
+    Route::post('/users-login-odi', 'login');
 });
 
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/logout', [UserRegisterController::class, 'logout']);
-    Route::get('/consulta-user', [UserRegisterController::class, 'consultaUser']);
-    Route::post('/authenticateLogin', [AuthController::class, 'authenticateLogin']);
+    Route::post('/users-logout-odi', [UserRegisterController::class, 'logout']);
+    Route::get('/users-consulta-odi', [UserRegisterController::class, 'consultaUser']);
+    Route::post('/authenticate-odi', [AuthController::class, 'authenticateLogin']);
     
 });
 
