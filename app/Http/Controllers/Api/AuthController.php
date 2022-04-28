@@ -4,6 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Enums\StatusUsuario;
+use App\Models\Keycloak\UserAttribute;
+use App\Models\Login\Profile;
+use App\Models\Login\PersonaProfile;
+use App\Models\Login\UserFunction;
+use App\Models\Login\RolFunction;
+use App\Models\Login\ProfileRol;
+use App\Models\Login\Rol;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +30,7 @@ class AuthController extends Controller
         if($request->isJson()){   
          
         
-        $validaToken = false; 
+        $validaToken =null; 
 
         try {
 
@@ -36,6 +43,8 @@ class AuthController extends Controller
         
             $token = $request->input('token');
             Filtrar($token, "STRING");     
+
+            Log::error('Incicia el proceso de recuperación de funciones y perfiles para el usuario '. $token);
             
             if (empty($token)) {
                 return response()->json(
@@ -47,23 +56,18 @@ class AuthController extends Controller
             }
             
            
-
+            
        
-           $PerfilesUsers = DB::connection('mysql3')->select("select odi.f_get_id_person('$token')");   
-           //$PerfilesUsers = DB::connection('mysql2')->table('CLIENT')->where('ID','f58ed2f3-eda1-4440-bfef-f254936e83e0')->get();  
+          // $UserAttribute = DB::connection('mysql3')->select("select odi.f_get_id_person('$token')");   
+           $UserAttribute = UserAttribute::where('USER_ID', $token)->first();
 
-           dd("Luego del Query", $PerfilesUsers);
 
-            if ($PerfilesUsers) { //(evaluar si los SP generan count)
-
-                foreach ($PerfilesUsers as $PerfilesUs) {
+            if ($UserAttribute) { 
+               
+                    $validaToken = $UserAttribute->USER_ID; 
+                    
                    
-
-                    //$validaToken = $PerfilesUs->resultado; // cambiar por valor del resultado real. 
-                    $validaToken = true; 
-
-
-                    if ($validaToken == false) {
+                    if ($validaToken == null) {
                         return response()->json(
                             [
                                 'resultado' => false,
@@ -74,12 +78,20 @@ class AuthController extends Controller
 
                         $arrayIdfuncionesUsuario[]=[];
 
+                        $USER_ID = 'de34df7b-c700-11ec-8f74-0242ac120002';//  = $UserAttribute->USER_ID;
+
+                        dd($USER_ID, "entro al binario");
+
+                        //$UserOdiPerfiles = DB::connection('mysql3')->select("call sp_get_functions_by_user('$token')"); 
+                        $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->first();
+                       // $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->with('recibeProfileRolPer')->get();
+                       // $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->recibeProfileRolPer();
                         
+                       dd($UserPersonaProfile, "persona profile");
 
-                        $UserOdiPerfiles = DB::connection('mysql3')->select("call sp_get_functions_by_user('$token')"); 
-                        //$UserOdiPerfiles = DB::connection('mysql3')->table('T_Function')->where('N_description','Ingreso de Centros')->first();
+                        $UserOdiPerfiles = Profile::where('id', $USER_ID)->first();
 
-                        dd($UserOdiPerfiles);
+                        dd($UserOdiPerfiles, "entro al else");
 
                        //if ($UserOdiPerfiles->count()) { // se activa al poner en funcion el select de SP (evaluar si los SP generan count)
 
@@ -126,8 +138,9 @@ class AuthController extends Controller
                             );
                         } */
                     }
-                } 
+                
             } else  {
+                Log::error('No se encontró información del usuario que intenta loguearse');
                 return response()->json(
                     [
                         'resultado' => false,
@@ -149,12 +162,15 @@ class AuthController extends Controller
             }
 
         } else {  
-        return response()->json(
-            [ 'resultado' => false,
-                'mensaje' =>'Proceso no atorizado, debe enviar los datos en un formato autorizado. '
-            ],
-            401, []); 
-        }
+            
+            Log::error('Proceso no atorizado, debe enviar los datos en un formato autorizado. ');
+
+            return response()->json(
+                [ 'resultado' => false,
+                    'mensaje' =>'Proceso no atorizado, debe enviar los datos en un formato autorizado. '
+                ],
+                401, []); 
+            }
 
     }
 

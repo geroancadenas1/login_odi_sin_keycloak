@@ -4,6 +4,7 @@ namespace App\Models\Login;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Login\RolFunction;
 
 class UserFunction extends Model
 {
@@ -11,7 +12,7 @@ class UserFunction extends Model
 
     protected $connection = 'mysql3';
     
-    protected $collection = 't_function';
+    protected $table = 't_function';
     
     protected $fillable = [
         'id',
@@ -24,9 +25,15 @@ class UserFunction extends Model
         'date_delete',
     ];
 
+    public function userFuncRolFunctions()
+    {
+        return $this->hasMany('App\Models\Login\RolFunction', 'id');
+    }
+    
     protected $hidden = [
         '',
     ];
 
+    
 
 }

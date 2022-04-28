@@ -4,6 +4,7 @@ namespace App\Models\Login;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Login\ProfileRol;
 
 class Profile extends Model
 {
@@ -11,7 +12,7 @@ class Profile extends Model
 
     protected $connection = 'mysql3';
     
-    protected $collection = 't_profiles';
+    protected $table = 't_profiles';
     
     protected $fillable = [
         'id',
@@ -24,6 +25,12 @@ class Profile extends Model
         'user_delete',
         'date_delete'
     ];
+
+    public function rolProfileRols()
+    {
+        return $this->hasMany('App\Models\Login\ProfileRol', 'id');
+    }
+
 
     protected $hidden = [
         '',

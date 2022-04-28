@@ -4,6 +4,7 @@ namespace App\Models\Login;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Login\ProfileRol;
 
 class PersonaProfile extends Model
 {
@@ -11,7 +12,7 @@ class PersonaProfile extends Model
 
     protected $connection = 'mysql3';
     
-    protected $collection = 't_r_persona_profiles';
+    protected $table = 't_r_persona_profiles';
     
     protected $fillable = [
         'id',
@@ -19,6 +20,11 @@ class PersonaProfile extends Model
 	    'id_r_profile_rol'
         
     ];
+
+    public function recibeProfileRolPer()
+    {
+        return $this->belongsTo('App\Models\Login\ProfileRol', 'id_r_profile_rol');
+    }
 
     protected $hidden = [
         '',

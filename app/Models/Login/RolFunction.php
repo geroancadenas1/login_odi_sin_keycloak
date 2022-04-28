@@ -4,6 +4,8 @@ namespace App\Models\Login;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Login\Rol;
+use App\Models\Login\UserFunction;
 
 class RolFunction extends Model
 {
@@ -11,7 +13,7 @@ class RolFunction extends Model
 
     protected $connection = 'mysql3';
     
-    protected $collection = 't_r_rol_function';
+    protected $table = 't_r_rol_function';
     
     protected $fillable = [
         'id',
@@ -23,5 +25,14 @@ class RolFunction extends Model
         '',
     ];
 
-    
+    public function recibeUserFunction()
+    {
+        return $this->belongsTo('App\Models\Login\UserFunction', 'id_function');
+    }
+
+    public function recibeRol()
+    {
+        return $this->belongsTo('App\Models\Login\Rol', 'id_rol');
+    }
+
 }

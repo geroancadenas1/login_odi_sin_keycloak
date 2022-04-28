@@ -68,9 +68,9 @@ return [
             'url' => env('DATABASE_URL'),
             'host' => '10.3.0.35',
             'port' => '3366',
-            'database' => 'odi',
-            'username' => 'consulta',
-            'password' => 'consulta',
+            'database' => 'kcdb',
+            'username' => 'odi_salud',
+            'password' => 'odi_salud_pwd',
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -82,13 +82,13 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        //para la base de ODI
+        //para la base de ODI_SEGURIDAD
         'mysql3' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => '10.3.0.35',
             'port' => '3366',
-            'database' => 'odi',
+            'database' => 'odi_seguridad',
             'username' => 'odi_salud',
             'password' => 'odi_salud_pwd',
             'unix_socket' => env('DB_SOCKET', ''),
