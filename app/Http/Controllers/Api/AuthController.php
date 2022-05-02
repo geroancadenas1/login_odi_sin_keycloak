@@ -17,9 +17,33 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
+
+
+
 class AuthController extends Controller
 {
-    
+
+    public static function encodeUuid($uuid): string
+    {
+        if (! Uuid::isValid($uuid)) {
+            return $uuid;
+        }
+        if (! $uuid instanceof Uuid) {
+            $uuid = Uuid::fromString($uuid);
+        }
+        return $uuid->getBytes();
+    }
+
+    public static function decodeUuid(string $binaryUuid): string
+    {
+        if (Uuid::isValid($binaryUuid)) {
+            return $binaryUuid;
+        }
+        return Uuid::fromBytes($binaryUuid)->toString();
+    }
+
     private static $messages = [
         'required' => 'El campo : token es obligatorio.'
     ];
@@ -28,128 +52,181 @@ class AuthController extends Controller
 
 
         if($request->isJson()){   
-         
-        
-        $validaToken =null; 
+                
+        $validaToken = null; 
+        $validar     = 0;
+        $mensaje     = "";
+        $ArrProfilesUsuario = array();
+        $ArrFuncionesUsuario = array();
 
         try {
 
-            $request->validate(
-                [
-                    'token' => 'required'
-                ],
-                self::$messages
-            );
-        
-            $token = $request->input('token');
-            Filtrar($token, "STRING");     
-
-            Log::error('Incicia el proceso de recuperación de funciones y perfiles para el usuario '. $token);
-            
-            if (empty($token)) {
-                return response()->json(
+                $request->validate(
                     [
-                        'resultado' => false,
-                        'mensaje' => "El campo 'TOKER' es requerido."
-                    ]
+                        'token' => 'required'
+                    ],
+                    self::$messages
                 );
-            }
-            
-           
-            
-       
-          // $UserAttribute = DB::connection('mysql3')->select("select odi.f_get_id_person('$token')");   
-           $UserAttribute = UserAttribute::where('USER_ID', $token)->first();
 
+                if ($validar >= 0) {
+                    $token = $request->input('token');
+                    Filtrar($token, "STRING");
+                }     
 
-            if ($UserAttribute) { 
-               
-                    $validaToken = $UserAttribute->USER_ID; 
-                    
-                   
-                    if ($validaToken == null) {
+                Log::error('Incicia el proceso de recuperación de funciones y perfiles para el usuario '. $token);
+                
+                    if (empty($token)) {
+                        $validar = -1;
                         return response()->json(
                             [
                                 'resultado' => false,
-                                'mensaje' => "El token que intenta registrarse, no es válido"
+                                'mensaje' => "El campo 'TOKER' es requerido."
                             ]
                         );
-                    } else {
-
-                        $arrayIdfuncionesUsuario[]=[];
-
-                        $USER_ID = 'de34df7b-c700-11ec-8f74-0242ac120002';//  = $UserAttribute->USER_ID;
-
-                        dd($USER_ID, "entro al binario");
-
-                        //$UserOdiPerfiles = DB::connection('mysql3')->select("call sp_get_functions_by_user('$token')"); 
-                        $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->first();
-                       // $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->with('recibeProfileRolPer')->get();
-                       // $UserPersonaProfile = PersonaProfile::where('id_persona', $USER_ID)->recibeProfileRolPer();
-                        
-                       dd($UserPersonaProfile, "persona profile");
-
-                        $UserOdiPerfiles = Profile::where('id', $USER_ID)->first();
-
-                        dd($UserOdiPerfiles, "entro al else");
-
-                       //if ($UserOdiPerfiles->count()) { // se activa al poner en funcion el select de SP (evaluar si los SP generan count)
-
-                            foreach ($UserOdiPerfiles as $UserOdiPerfil) {
-
-                                dd("Dentro del Foraech", $UserOdiPerfil);
-                            
-                                $status = $UserOdiPerfil->status;
-                                
-                                    if($status == StatusUsuario::INACTIVO){
-                    
-                                        return response()->json(
-                                            [
-                                                'resultado' => false,
-                                                'mensaje' => "El usuario que intenta ingresar, se encuentra inactivo."
-                                            ]
-                                        );
-                                    }
-
-                                
-
-                                    $arrayIdfuncionesUsuario[] = [
-                                        "",
-                                        ""
-                                    ];
-                                
-                                return response()->json(
-                                    array(
-                                        'resultado'      => true,
-                                        'email'          => $UserOdiPerfil->email,
-                                        'user_id'        => $UserOdiPerfil->name,
-                                        'user_jerarquia' => $UserOdiPerfil->password,
-                                        'id_funciones'   => $arrayIdfuncionesUsuario
-                                    ),
-                                    200
-                                );
-                            }
-                         /* } else {
-                            return response()->json(
-                                [
-                                    'resultado' => false,
-                                    'mensaje' => "No se encontró funciones asignadas al usuario logueado"
-                                ]
-                            );
-                        } */
                     }
-                
-            } else  {
-                Log::error('No se encontró información del usuario que intenta loguearse');
-                return response()->json(
-                    [
-                        'resultado' => false,
-                        'mensaje' => "No se encontró información del usuario que intenta loguearse"
-                    ]
-                );
-            }
+    
+                    if ($validar >= 0) {
+                        $UserAttribute = UserAttribute::where('USER_ID', $token)->first();
+
+                        if ($UserAttribute == null) {
+                            $validar = -2;
+                            $mensaje = "No se encontró información del usuario que intenta loguearse";
+                        } else {
+                            // mandar a buscar en los mails, validarv tabla con samuel
+                            // $UserAttribute=true;
+                        }
+                    }
+
+                    if ($UserAttribute) { 
+                    
+                            $validaToken = $UserAttribute->USER_ID; 
+                            
+                            
+                            if ($validaToken == null) {
+                                return response()->json(
+                                    [
+                                        'resultado' => false,
+                                        'mensaje' => "El token que intenta registrarse, no es válido"
+                                    ]
+                                );
+                            } else {
+
+                            $USER_ID ='d5eb6a0d-c6f2-11ec-8f74-0242ac120002' ;//  = $UserAttribute->USER_ID;
+                            $isUuid = Str::isUuid('de34df7b-c700-11ec-8f74-0242ac120002');
+                            $id_persona = $this->encodeUuid($USER_ID);
+
+                             
+                            $userPersonaProfiles = PersonaProfile::where('id_persona',$id_persona)->get(); // get porque hay muchos id personas con varios id profile rol
+                             
+                                if ($userPersonaProfiles->count()) { 
+                                   
+                                    foreach ($userPersonaProfiles as $userPersonaProfile) {
+
+                                        $id_r_profile_rol = $userPersonaProfile->id_r_profile_rol;
+                                        $id_r_profile_rolDecodificado = $this->decodeUuid($id_r_profile_rol);
+
+                                        $profileRol = $userPersonaProfile->recibeProfileRolPer()->where('id', $id_r_profile_rol)->first();  // un first porque solo hay un id_profile_rol para varias personas
+
+                                        if($profileRol) {
+                                            $id_rol = $profileRol['id_rol'];
+                                            $id_profile = $profileRol['id_profiles'];
+
+                                            $profile = Profile::where('id', $id_profile )->first();
+                                                if($profile) { $n_profile_name_pro = $profile->n_profile_name; $n_description_pro  = $profile->n_description; } else { $n_profile_name_pro  =""; $n_description_pro = "";}
+	                                        $rol = Rol::where('id', $id_rol)->first();
+                                                if($rol) { $n_profile_name_rol = $rol->n_profile_name; $n_description_pro_rol = $rol->n_description;} else { $n_profile_name_rol = ""; $n_description_pro_rol = "";}
+
+                                                $rolFunciones = $rol->rolRolFunction()->where('id_rol', $id_rol)->get();
+                                                
+
+                                                foreach ($rolFunciones as $rolFuncion) {
+
+                                                    $id_function = $rolFuncion->id_function;
+                                        
+                                                    $UserFunctiones = UserFunction::where('id', $id_function)->get();
+                                            
+                                                    foreach ($UserFunctiones as $UserFunction) {
+                                            
+                                                        $FuncionesUsuario =  array(
+                                                            'n_function_name'         => $UserFunction->n_function_name,
+                                                            'n_description_function'  => $UserFunction->n_description,
+                                                        );
+
+                                                        array_push($ArrFuncionesUsuario, $FuncionesUsuario);
+                                                    }
+                                            
+                                                }
 
 
+                                        } else {
+                                            $id_rol                = "";
+                                            $id_profile            = "";
+                                            $n_profile_name_pro    = "";
+                                            $n_description_pro     = "";
+                                            $n_profile_name_rol    = "";
+                                            $n_description_pro_rol = "";
+                                        }
+                                        
+                                        $ProfilesUsuario =  array(
+                                            'id_persona'           => $this->decodeUuid($userPersonaProfile->id_persona),
+                                            'id_r_profile_rol'     => $id_r_profile_rolDecodificado,
+                                            'n_profile_name_pro'   => $n_profile_name_pro,
+                                            'n_description_pro'    => $n_description_pro,
+                                            'n_profile_name_rol'   => $n_profile_name_rol,
+                                            'n_description_rol'    => $n_description_pro_rol,
+                                            'funciones'            => $ArrFuncionesUsuario
+                                        );
+                                        
+                                        array_push($ArrProfilesUsuario, $ProfilesUsuario);
+                                           
+                                    }
+                                    
+                                    $objetoProfilesUsuario= [
+                                        'persona_profile' => $ArrProfilesUsuario,
+                                        'tipo' => "Objeto de profile, roles y funciones",
+                                    ];
+
+                                    //$status = $userPersonaProfile->status; // mandar status del usuario
+                                    $status = 1;
+                                    
+                                        if($status == StatusUsuario::INACTIVO){
+                                            return response()->json(
+                                                [
+                                                    'resultado' => false,
+                                                    'mensaje' => "El usuario que intenta ingresar, se encuentra inactivo."
+                                                ]
+                                            );
+                                        }
+
+                                        
+                                    return response()->json(
+                                        array(
+                                            'resultado'      => true,
+                                            'id_usuario'     => $USER_ID,
+                                            'objeto_usuario' => $objetoProfilesUsuario
+                                        ),
+                                        200
+                                    );
+                                    
+                                } else {
+                                    return response()->json(
+                                        [
+                                            'resultado' => false,
+                                            'mensaje' => "No se encontró funciones asignadas al usuario logueado"
+                                        ]
+                                    );
+                                } 
+                            }
+                        
+                    } else  {
+                        Log::error('No se encontró información del usuario que intenta loguearse');
+                        return response()->json(
+                            [
+                                'resultado' => false,
+                                'mensaje' => $mensaje
+                            ]
+                        );
+                    }
             } catch (Exception $ex) {
                 Log::error('Ha ocurrido un error al obtener los perfiles del usuario '. $ex);
                 
@@ -171,7 +248,6 @@ class AuthController extends Controller
                 ],
                 401, []); 
             }
-
     }
 
 }

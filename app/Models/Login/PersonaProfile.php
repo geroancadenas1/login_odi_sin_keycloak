@@ -5,6 +5,10 @@ namespace App\Models\Login;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Login\ProfileRol;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+
+
 
 class PersonaProfile extends Model
 {
