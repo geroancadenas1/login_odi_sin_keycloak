@@ -22,12 +22,10 @@ Route::controller(UserRegisterController::class)->group(function(){
     Route::post('/users-login-odi', 'login');
 });
 
-
+Route::post('/authenticate-odi', [AuthController::class, 'authenticateLogin']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/users-logout-odi', [UserRegisterController::class, 'logout']);
     Route::get('/users-consulta-odi', [UserRegisterController::class, 'consultaUser']);
-    Route::post('/authenticate-odi', [AuthController::class, 'authenticateLogin']);
-    
 });
 
