@@ -12,6 +12,8 @@ class GenericEmail extends Model
     protected $connection = 'mysql4';
     
     protected $table = 't_email';
+
+    protected $primaryKey = 'id'; // Clave primaria
    
     protected $fillable = [
         'id',

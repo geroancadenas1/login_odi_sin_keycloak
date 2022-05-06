@@ -114,41 +114,43 @@ class AuthController extends Controller
                 }
                 
                 if ($validar >= 0) {
-                    $UserAttribute = UserAttribute::where('USER_ID', 453345)->first();
-
+                    $UserAttribute = UserAttribute::where('USER_ID', '3242242')->first();
+                   // $UserAttribute = UserAttribute::where('USER_ID', $id_persona)->first();
+                  
                     if($UserAttribute == null) {
 
+                        
+
                         $UserEntity = UserEntity::where('ID', $id_persona)->first();
+                       
+                       // dd($UserEntity->ID, $UserEntity->EMAIL);
                        
                         if($UserEntity)
                         {
                             $n_email = $UserEntity->EMAIL;
-                            
+                           
                             if($n_email != "")  
                             {
-                                $GenericEmail = GenericEmail::select('id')->where('n_email', $n_email)->first();
 
-                               // $key = Uuid::fromBytes($GenericEmail->id)->toString();
+                                  $GenericEmail = GenericEmail::select('id', 'n_email')->where('n_email', $n_email)->first();
 
-                              // dd($GenericEmail->id,  $key );
+                               //dd($GenericEmail->n_email, $GenericEmail->id);
+                               dd($GenericEmail); 
 
                                 if($GenericEmail)
                                 {
-                                  //  dd($GenericEmail );
+                                  
                                     $id_email=$GenericEmail->id;
-
-                                   // dd($id_email );
-
-                                    ///$table->char('url_hash', 16)->charset('binary');
-
-                                  // dd($this->decodeUuid($id_email) );
+                                     // dd($id_email );
                                                                        
                                     $GenericPersonaEmail = $GenericEmail->genericPersonalEmail()->where('id', $id_email)->first(); 
+
+                                   dd($GenericPersonaEmail );
 
                                     if($GenericPersonaEmail)
                                     {
                                         $id_personaDB =  $GenericPersonaEmail->id_persona;  
-                                        $id_personaDB = $this->decodeUuid($GenericPersonaEmail->id_persona);
+                                        $id_personaDB = $this->decodeUuid($GenericPersonaEmail->id_persona); //solo para ver
                                         
                                         
                                     } else {
