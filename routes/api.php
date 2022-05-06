@@ -16,13 +16,14 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
-
 Route::controller(UserRegisterController::class)->group(function(){
     Route::post('/users-register-odi', 'register');
     Route::post('/users-login-odi', 'login');
 });
 
-Route::post('/authenticate-odi', [AuthController::class, 'authenticateLogin']);
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::post('/authenticate-odi', [AuthController::class, 'authenticateLogin']);
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/users-logout-odi', [UserRegisterController::class, 'logout']);

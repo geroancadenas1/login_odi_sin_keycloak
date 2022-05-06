@@ -4,6 +4,7 @@ namespace App\Models\Login;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use  App\Models\Login\GenericEmail;
 
 class GenericPersonaEmail extends Model
 {
@@ -15,7 +16,7 @@ class GenericPersonaEmail extends Model
    
     
     protected $fillable = [
-        'id',
+        'ID',
         'id_persona',
 	    'id_email'
     ];

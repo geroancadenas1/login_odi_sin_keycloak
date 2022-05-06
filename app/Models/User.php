@@ -12,19 +12,24 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-   // protected $connection = 'mysql3';
+    //protected $connection = 'mysql2';
+
+    protected $table = 'USER_ENTITY';
      
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'status'
+        'ID',
+        'EMAIL',
+        'EMAIL_CONSTRAINT',
+        'EMAIL_VERIFIED',
+        'FEDERATION_LINK',
+        'FIRST_NAME',
+        'LAST_NAME',
+        'USERNAME'
     ];
 
     
     protected $hidden = [
-        'password',
-        'remember_token',
+        ''
     ];
 
     

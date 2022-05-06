@@ -9,6 +9,8 @@ class RegisterLog extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql2';
+
     protected $table = 'REGISTER_LOGS';
     
     protected $fillable = [
