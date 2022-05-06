@@ -4,29 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Enums\StatusUsuario;
-use App\Models\Keycloak\UserAttribute;
-use App\Models\Keycloak\UserEntity;
 use App\Models\Login\GenericEmail;
-use App\Models\Login\GenericPersonaEmail;
-use App\Models\Login\Profile;
 use App\Models\Login\PersonaProfile;
-use App\Models\Login\UserFunction;
-use App\Models\Login\RolFunction;
-use App\Models\Login\ProfileRol;
-use App\Models\Login\Rol;
 use App\Models\RegisterLog;
-use DateTime;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Exception;
 use Carbon\Carbon;
-
-use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Fluent;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -204,11 +189,13 @@ class AuthController extends Controller
 
                                 } else {
                                     $objetoProfilesUsuario = [];
+                                    $resultadoFunciones ="Existe un error al tratar de obtener los perfiles y funciones del usuario";
                                     return response()->json(
                                         array(
                                             'resultado'      => false,
                                             'id_usuario'     => $tokenId,
                                             'email'          => $email,
+                                            'mensaje'        => $resultadoFunciones,
                                             'objeto_usuario' => $objetoProfilesUsuario
                                         ),
                                         400

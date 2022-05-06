@@ -41,10 +41,7 @@ class PersonaProfile extends Model
                                          ->join('odi_seguridad.t_rol', 'odi_seguridad.t_rol.id', '=', 'odi_seguridad.t_r_profile_rol.id_rol')
                                          ->join('odi_seguridad.t_r_rol_function', 'odi_seguridad.t_rol.id', '=', 'odi_seguridad.t_r_rol_function.id_rol')
                                          ->join('odi_seguridad.t_function', 'odi_seguridad.t_function.id', '=', 'odi_seguridad.t_r_rol_function.id_function')
-                                         ->select('odi_seguridad.t_profiles.n_description', 'odi_seguridad.t_profiles.n_profile_name', 'odi_seguridad.t_rol.n_description as rol_description', 'odi_seguridad.t_rol.n_profile_name as rol_profile_name');
-
-                                
-            
+                                         ->select('odi_seguridad.t_profiles.n_description', 'odi_seguridad.t_profiles.n_profile_name', 'odi_seguridad.t_rol.n_description as rol_description', 'odi_seguridad.t_rol.n_profile_name as rol_profile_name');       
     }
     
 }

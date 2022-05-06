@@ -34,8 +34,7 @@ class GenericEmail extends Model
                             ->select('odi_generic.t_r_persona_email.id_persona');
             
     }
-
-
+    
     protected $hidden = [
         '',
     ];
